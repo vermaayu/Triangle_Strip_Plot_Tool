@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <GL/glut.h>
 #include <math.h>
+#include <fstream>
+
+#define W_WIDTH  500
+#define W_HEIGHT  500
 
 using namespace std;
 
@@ -29,6 +33,7 @@ public:
 };
 
 /////////////////////GLOBAL VARIABLES////////////////////////////////////////////
+
 float h1,h2;
 Point arr[10];
 int index = 0;
@@ -74,11 +79,22 @@ void drawStrip(float x1 , float y1, float x2, float y2, float x3, float y3){
 
 void mouse(int button, int state , int x , int y) {
 if(button == GLUT_LEFT_BUTTON && state == GLUT_UP) 
-{	cout << "(" << x << ", " << y << ")\n" << endl;
-	arr[index].setxy((float)x,(float)(250 - y));
+{	cout << "(" << (x) << ", " << (500-y) << ")\n" << endl;			// Figures will be made in the first quadrant.
+	arr[index].setxy((float)x,(float)(500 - y));
     index++;
-}
 	drawDot(x,y);
+}
+	
+else if(button == GLUT_RIGHT_BUTTON && state == GLUT_UP) 
+{
+	ofstream myfile;
+	myfile.open ("Coordinate.txt");
+	for(int i = 0 ;i<(sizeof(arr)/sizeof(*arr)); i++){
+		myfile << "(" << arr[i].x << ", " << arr[i].y << ")\n";
+	}
+	myfile.close();
+
+}
 
 	if(flag == 3)
 	{
@@ -89,20 +105,28 @@ if(button == GLUT_LEFT_BUTTON && state == GLUT_UP)
 		flag++;
 	}
 
-}
 
+	glutPostRedisplay();					//////////////////////////////Check this
+}
 
 /*--------------Window Creation Specs--------------------------------------*/
-void init(){
-	glClearColor(1.0,1.0,1.0,0.0);
-    glColor3f(1.0,1.0,0.0);
+void init()
+{
+	glClearColor(0.0,1.0,1.0,0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glFlush();
 }
 
 
-void display(){
-	glutMouseFunc(mouse);
+void display()
+{
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
+	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer (background)
+ 
+	
+ 
+   glFlush(); 
 }
-
 /*--------------Window Creation Specs Ends--------------------------------------*/
 
 
@@ -110,18 +134,17 @@ void display(){
 
 int main(int argc,char **argv)
 {
-//////////////////////////////////////////////
-	glutInitWindowSize(500,500);
+	
+	glutInit(&argc,argv);		
+	
+	glutInitWindowSize(500, 500);
 	glutInitWindowPosition(2000,200);
 	glutCreateWindow("Triangle_Strip_Workspace");
-	gluOrtho2D(0.0,250.0,0.0,250.0);
-	init();
-	glutDisplayFunc(display);
 	
+	glutDisplayFunc(display);
+	glutMouseFunc(mouse);
 	
 	glutMainLoop();
-/////////////////////////////////////////////	
-
-
+	
 	return 0;
 }
